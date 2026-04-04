@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- Standardmäßig werden alle App-Daten gesichert. Exclude-Regeln können hier ergänzt werden. -->
+        <include domain="root" path="." />
+    </cloud-backup>
+    <device-transfer>
+        <!-- Standardmäßig werden alle App-Daten bei Gerätetransfer übertragen. -->
+        <include domain="root" path="." />
+    </device-transfer>
+</data-extraction-rules>
