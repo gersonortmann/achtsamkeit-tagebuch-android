@@ -315,18 +315,18 @@ enum class MoodLevel(val score: Int, val emoji: String, val label: String) {
 
 ### Phase 0 – Projektsetup & Grundgerüst
 **Ziel:** Saubere Projektbasis, die alle Phasen trägt.  
-**Geschätzter Aufwand:** 1 Session
+**Status:** ✅ **ERLEDIGT**
 
 #### Aufgaben
-- [ ] Android Studio: Neues Projekt anlegen (Kotlin + Compose + Empty Activity)
-- [ ] `libs.versions.toml` aufsetzen (alle Abhängigkeiten zentral)
-- [ ] Ordnerstruktur gemäß Architektur anlegen (Packages anlegen)
-- [ ] Hilt Dependency Injection einrichten und prüfen
-- [ ] Material3 Theme (Light + Dark) einrichten
-- [ ] Basis-Navigation (NavController) einrichten
-- [ ] GitHub-Repository anlegen & initialen Commit pushen
-- [ ] `.gitignore` mit Android-Standardausschlüssen
-- [ ] `local.properties` in `.gitignore` aufnehmen (API-Keys schützen!)
+- [x] Android Studio: Neues Projekt anlegen (Kotlin + Compose + Empty Activity)
+- [x] `libs.versions.toml` aufsetzen (alle Abhängigkeiten zentral)
+- [x] Ordnerstruktur gemäß Architektur anlegen (Packages anlegen)
+- [x] Hilt Dependency Injection einrichten und prüfen
+- [x] Material3 Theme (Light + Dark) einrichten
+- [x] Basis-Navigation (NavController) einrichten
+- [x] GitHub-Repository anlegen & initialen Commit pushen
+- [x] `.gitignore` mit Android-Standardausschlüssen
+- [x] `local.properties` in `.gitignore` aufnehmen (API-Keys schützen!)
 
 #### Akzeptanzkriterien
 - ✅ App startet auf Emulator UND echtem Gerät (Pixel 10 Pro / S24)
@@ -338,19 +338,19 @@ enum class MoodLevel(val score: Int, val emoji: String, val label: String) {
 
 ### Phase 1 – Datenbank & Domain-Schicht
 **Ziel:** Solides Datenfundament für alle Features.  
-**Geschätzter Aufwand:** 1–2 Sessions
+**Status:** ✅ **ERLEDIGT**
 
 #### Aufgaben
-- [ ] Room-Datenbank definieren (`MindJournalDatabase`)
-- [ ] Entity `JournalEntryEntity` (vollständiges Schema)
+- [x] Room-Datenbank definieren (`AppDatabase`)
+- [x] Entity `JournalEntryEntity` (vollständiges Schema)
 - [ ] Entity `GuidedQuestionEntity` mit Standard-Fragen (vorbefüllt)
-- [ ] DAO: `JournalEntryDao` (CRUD + Flows für reaktive Updates)
+- [x] DAO: `JournalEntryDao` (CRUD + Flows für reaktive Updates)
 - [ ] DAO: `GuidedQuestionDao`
-- [ ] Domain-Modelle (keine Room-Abhängigkeit)
-- [ ] Repository-Interfaces (Domain-Layer)
-- [ ] Repository-Implementierungen (Data-Layer)
-- [ ] Hilt-Module für Datenbank und Repositories
-- [ ] DataStore für App-Einstellungen einrichten
+- [x] Domain-Modelle (keine Room-Abhängigkeit)
+- [x] Repository-Interfaces (Domain-Layer)
+- [x] Repository-Implementierungen (Data-Layer)
+- [x] Hilt-Module für Datenbank und Repositories
+- [x] DataStore für App-Einstellungen einrichten
 
 #### Standard-Geführte Fragen (vorbefüllt)
 ```

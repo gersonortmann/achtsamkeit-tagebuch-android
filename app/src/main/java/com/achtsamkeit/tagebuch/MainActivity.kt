@@ -1,47 +1,37 @@
 package com.achtsamkeit.tagebuch
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.achtsamkeit.tagebuch.ui.theme.AchtsamkeitstagebuchTheme
+import androidx.fragment.app.FragmentActivity
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.achtsamkeit.tagebuch.core.navigation.AchtsamkeitNavGraph
+import com.achtsamkeit.tagebuch.presentation.security.LockScreen
+import com.achtsamkeit.tagebuch.presentation.security.SecurityViewModel
+import com.achtsamkeit.tagebuch.ui.theme.AchtsamkeitTheme
+import dagger.hilt.android.AndroidEntryPoint
 
-class MainActivity : ComponentActivity() {
+@AndroidEntryPoint
+class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            AchtsamkeitstagebuchTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
+            AchtsamkeitTheme {
+                val securityViewModel: SecurityViewModel = viewModel()
+                val isAuthenticated by securityViewModel.isAuthenticated.collectAsState()
+
+                if (isAuthenticated) {
+                    AchtsamkeitNavGraph()
+                } else {
+                    LockScreen(
+                        viewModel = securityViewModel,
+                        onAuthenticated = { /* Wird über State gesteuert */ }
                     )
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    AchtsamkeitstagebuchTheme {
-        Greeting("Android")
     }
 }
