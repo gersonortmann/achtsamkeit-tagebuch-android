@@ -14,5 +14,6 @@ interface JournalRepository {
     fun getAllQuestions(): Flow<List<GuidedQuestion>>
     fun getSelectedQuestions(): Flow<List<GuidedQuestion>>
     suspend fun insertQuestion(question: GuidedQuestion)
+    suspend fun updateQuestion(question: GuidedQuestion)
     suspend fun getRandomQuestion(): GuidedQuestion?
 }

@@ -4,9 +4,8 @@ import com.achtsamkeit.tagebuch.domain.model.GuidedQuestion
 import com.achtsamkeit.tagebuch.domain.repository.JournalRepository
 import javax.inject.Inject
 
-class UpdateQuestionUseCase @Inject constructor(
+class GetRandomQuestionUseCase @Inject constructor(
     private val repository: JournalRepository
 ) {
-    suspend operator fun invoke(question: GuidedQuestion) =
-        repository.updateQuestion(question)
+    suspend operator fun invoke(): GuidedQuestion? = repository.getRandomQuestion()
 }

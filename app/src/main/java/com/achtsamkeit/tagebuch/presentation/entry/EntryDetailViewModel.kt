@@ -3,7 +3,6 @@ package com.achtsamkeit.tagebuch.presentation.entry
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.achtsamkeit.tagebuch.domain.model.JournalEntry
 import com.achtsamkeit.tagebuch.domain.usecase.GetEntryByIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,12 +10,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-data class EntryDetailUiState(
-    val entry: JournalEntry? = null,
-    val isLoading: Boolean = false,
-    val error: String? = null
-)
 
 @HiltViewModel
 class EntryDetailViewModel @Inject constructor(

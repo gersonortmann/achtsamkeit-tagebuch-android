@@ -3,8 +3,6 @@ package com.achtsamkeit.tagebuch.domain.model
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-
-
 data class JournalEntry(
     val id: Long = 0,
     val date: LocalDate = LocalDate.now(),

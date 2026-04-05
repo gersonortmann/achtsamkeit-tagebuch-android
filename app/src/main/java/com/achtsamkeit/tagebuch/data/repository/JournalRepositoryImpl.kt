@@ -40,6 +40,9 @@ class JournalRepositoryImpl @Inject constructor(
     override suspend fun insertQuestion(question: GuidedQuestion) =
         questionDao.insertQuestion(question.toEntity())
 
+    override suspend fun updateQuestion(question: GuidedQuestion) =
+        questionDao.updateQuestion(question.toEntity())
+
     override suspend fun getRandomQuestion(): GuidedQuestion? =
         questionDao.getRandomQuestion()?.toDomain()
 }
