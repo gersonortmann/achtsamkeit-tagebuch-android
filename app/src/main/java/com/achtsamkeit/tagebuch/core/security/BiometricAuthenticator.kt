@@ -1,27 +1,26 @@
 package com.achtsamkeit.tagebuch.core.security
 
-import android.content.Context
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import javax.inject.Inject
 
-class BiometricAuthenticator @Inject constructor() {
+class BiometricAuthenticator @Inject constructor() : BiometricService {
 
-    fun isBiometricAvailable(context: Context): Boolean {
-        val biometricManager = BiometricManager.from(context)
+    override fun isAvailable(activity: FragmentActivity): Boolean {
+        val biometricManager = BiometricManager.from(activity)
         return biometricManager.canAuthenticate(
-            BiometricManager.Authenticators.BIOMETRIC_STRONG or 
+            BiometricManager.Authenticators.BIOMETRIC_STRONG or
             BiometricManager.Authenticators.DEVICE_CREDENTIAL
         ) == BiometricManager.BIOMETRIC_SUCCESS
     }
 
-    fun promptAuthenticate(
+    override fun authenticate(
         activity: FragmentActivity,
         title: String,
         subtitle: String,
-        onSuccess: (BiometricPrompt.AuthenticationResult) -> Unit,
+        onSuccess: () -> Unit,
         onError: (Int, CharSequence) -> Unit,
         onFailed: () -> Unit
     ) {
@@ -30,7 +29,7 @@ class BiometricAuthenticator @Inject constructor() {
             object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
-                    onSuccess(result)
+                    onSuccess()
                 }
 
                 override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
@@ -48,7 +47,7 @@ class BiometricAuthenticator @Inject constructor() {
             .setTitle(title)
             .setSubtitle(subtitle)
             .setAllowedAuthenticators(
-                BiometricManager.Authenticators.BIOMETRIC_STRONG or 
+                BiometricManager.Authenticators.BIOMETRIC_STRONG or
                 BiometricManager.Authenticators.DEVICE_CREDENTIAL
             )
             .build()

@@ -7,9 +7,12 @@ import androidx.room.PrimaryKey
 data class JournalEntryEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val date: Long,           // Zeitstempel
-    val content: String,      // Der eigentliche Text
-    val mood: String?,        // Optionales Mood-Emoji oder ID
-    val isFavorite: Boolean = false,
-    val aiSummary: String? = null // Platzhalter für Phase 7 (Gemini)
+    val date: Long,           // Zeitstempel (LocalDate to epoch day)
+    val createdAt: Long,      // LocalDateTime to epoch milli
+    val moodScore: Int,
+    val moodEmoji: String,
+    val freeText: String,
+    val gratitudeItems: String, // Pipe-getrennte Liste
+    val guidedAnswersJson: String, // Speichert Fragen und Antworten als JSON
+    val tags: String = "" // Pipe-getrennte Tags
 )

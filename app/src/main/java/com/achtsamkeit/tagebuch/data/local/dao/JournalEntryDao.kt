@@ -16,7 +16,6 @@ interface JournalEntryDao {
 
     @Query("SELECT * FROM journal_entries WHERE id = :id")
     suspend fun getEntryById(id: Long): JournalEntryEntity?
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertEntry(entry: JournalEntryEntity): Long
 
@@ -25,7 +24,4 @@ interface JournalEntryDao {
 
     @Delete
     suspend fun deleteEntry(entry: JournalEntryEntity)
-
-    @Query("SELECT * FROM journal_entries WHERE isFavorite = 1 ORDER BY date DESC")
-    fun getFavoriteEntries(): Flow<List<JournalEntryEntity>>
 }

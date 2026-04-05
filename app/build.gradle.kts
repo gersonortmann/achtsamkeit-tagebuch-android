@@ -10,12 +10,12 @@ plugins {
 
 android {
     namespace   = "com.achtsamkeit.tagebuch"
-    compileSdk  = 35
+    compileSdk  = 36
 
     defaultConfig {
         applicationId    = "com.achtsamkeit.tagebuch"
         minSdk           = 31
-        targetSdk        = 35
+        targetSdk        = 36
         versionCode      = 1
         versionName      = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -102,6 +102,8 @@ dependencies {
     testImplementation(libs.turbine)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.androidx.arch.core.testing)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.test.core)
 
     // ── Testing: Instrumented ─────────────────────────────────────────────
     androidTestImplementation(libs.androidx.junit)

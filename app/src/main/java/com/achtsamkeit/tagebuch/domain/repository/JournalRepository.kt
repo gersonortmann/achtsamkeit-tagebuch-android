@@ -1,18 +1,18 @@
 package com.achtsamkeit.tagebuch.domain.repository
 
-import com.achtsamkeit.tagebuch.data.local.entities.GuidedQuestionEntity
-import com.achtsamkeit.tagebuch.data.local.entities.JournalEntryEntity
+import com.achtsamkeit.tagebuch.domain.model.GuidedQuestion
+import com.achtsamkeit.tagebuch.domain.model.JournalEntry
 import kotlinx.coroutines.flow.Flow
 
 interface JournalRepository {
-    fun getAllEntries(): Flow<List<JournalEntryEntity>>
-    suspend fun getEntryById(id: Long): JournalEntryEntity?
-    suspend fun insertEntry(entry: JournalEntryEntity): Long
-    suspend fun updateEntry(entry: JournalEntryEntity)
-    suspend fun deleteEntry(entry: JournalEntryEntity)
+    fun getAllEntries(): Flow<List<JournalEntry>>
+    suspend fun getEntryById(id: Long): JournalEntry?
+    suspend fun insertEntry(entry: JournalEntry): Long
+    suspend fun updateEntry(entry: JournalEntry)
+    suspend fun deleteEntry(entry: JournalEntry)
 
-    // Geführte Fragen
-    fun getAllQuestions(): Flow<List<GuidedQuestionEntity>>
-    suspend fun insertQuestion(question: GuidedQuestionEntity)
-    suspend fun getRandomQuestion(): GuidedQuestionEntity?
+    fun getAllQuestions(): Flow<List<GuidedQuestion>>
+    fun getSelectedQuestions(): Flow<List<GuidedQuestion>>
+    suspend fun insertQuestion(question: GuidedQuestion)
+    suspend fun getRandomQuestion(): GuidedQuestion?
 }

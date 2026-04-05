@@ -6,12 +6,17 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
+import com.achtsamkeit.tagebuch.core.security.BiometricAuthenticator
+import com.achtsamkeit.tagebuch.core.security.BiometricService
 import com.achtsamkeit.tagebuch.core.utils.Constants
+import com.achtsamkeit.tagebuch.data.local.database.AppDatabase.Companion.MIGRATION_3_4
 import com.achtsamkeit.tagebuch.data.local.dao.GuidedQuestionDao
 import com.achtsamkeit.tagebuch.data.local.dao.JournalEntryDao
 import com.achtsamkeit.tagebuch.data.local.database.AppDatabase
+import com.achtsamkeit.tagebuch.data.repository.AchtsamkeitRepositoryImpl
 import com.achtsamkeit.tagebuch.data.repository.JournalRepositoryImpl
 import com.achtsamkeit.tagebuch.data.repository.SecurityRepositoryImpl
+import com.achtsamkeit.tagebuch.domain.repository.AchtsamkeitRepository
 import com.achtsamkeit.tagebuch.domain.repository.JournalRepository
 import com.achtsamkeit.tagebuch.domain.repository.SecurityRepository
 import dagger.Module
@@ -40,7 +45,10 @@ object AppModule {
             context,
             AppDatabase::class.java,
             Constants.DATABASE_NAME
-        ).build()
+        )
+        .addMigrations(MIGRATION_3_4)
+        .fallbackToDestructiveMigration(false)
+        .build()
     }
 
     @Provides
@@ -69,4 +77,14 @@ object AppModule {
     fun provideSecurityRepository(dataStore: DataStore<Preferences>): SecurityRepository {
         return SecurityRepositoryImpl(dataStore)
     }
+
+    @Provides
+    @Singleton
+    fun provideAchtsamkeitRepository(dataStore: DataStore<Preferences>): AchtsamkeitRepository {
+        return AchtsamkeitRepositoryImpl(dataStore)
+    }
+
+    @Provides
+    @Singleton
+    fun provideBiometricService(impl: BiometricAuthenticator): BiometricService = impl
 }

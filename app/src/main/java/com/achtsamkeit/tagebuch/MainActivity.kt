@@ -10,6 +10,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.achtsamkeit.tagebuch.core.navigation.AchtsamkeitNavGraph
 import com.achtsamkeit.tagebuch.presentation.security.LockScreen
 import com.achtsamkeit.tagebuch.presentation.security.SecurityViewModel
+import com.achtsamkeit.tagebuch.presentation.settings.SettingsViewModel
 import com.achtsamkeit.tagebuch.ui.theme.AchtsamkeitTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -19,7 +20,10 @@ class MainActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            AchtsamkeitTheme {
+            val settingsViewModel: SettingsViewModel = viewModel()
+            val themeConfig by settingsViewModel.themeConfig.collectAsState()
+
+            AchtsamkeitTheme(themeConfig = themeConfig) {
                 val securityViewModel: SecurityViewModel = viewModel()
                 val isAuthenticated by securityViewModel.isAuthenticated.collectAsState()
 

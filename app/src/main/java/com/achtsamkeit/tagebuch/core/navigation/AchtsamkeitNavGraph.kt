@@ -2,10 +2,14 @@ package com.achtsamkeit.tagebuch.core.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.achtsamkeit.tagebuch.presentation.archive.ArchiveScreen
+import com.achtsamkeit.tagebuch.presentation.entry.CreateEntryScreen
+import com.achtsamkeit.tagebuch.presentation.entry.EntryDetailScreen
 import com.achtsamkeit.tagebuch.presentation.home.HomeScreen
 import com.achtsamkeit.tagebuch.presentation.settings.SettingsScreen
 
@@ -26,8 +30,21 @@ fun AchtsamkeitNavGraph(
         composable(Screen.Settings.route) {
             SettingsScreen(navController = navController)
         }
-        composable(Screen.CreateEntry.route) {
-            // Wird in Phase 2 implementiert
+        composable(
+            route = Screen.CreateEntry.route,
+            arguments = listOf(navArgument("entryId") { type = NavType.LongType; defaultValue = -1L })
+        ) {
+            CreateEntryScreen(navController = navController)
+        }
+        composable(
+            route = Screen.EntryDetail.route,
+            arguments = listOf(navArgument("entryId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val entryId = backStackEntry.arguments?.getLong("entryId") ?: -1L
+            EntryDetailScreen(
+                entryId = entryId,
+                navController = navController
+            )
         }
     }
 }

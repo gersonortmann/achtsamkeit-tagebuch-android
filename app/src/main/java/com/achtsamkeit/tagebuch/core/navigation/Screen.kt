@@ -8,7 +8,9 @@ sealed class Screen(val route: String) {
     object Home        : Screen("home")
     object Archive     : Screen("archive")
     object Settings    : Screen("settings")
-    object CreateEntry : Screen("create_entry")
+    object CreateEntry : Screen("create_entry?entryId={entryId}") {
+        fun createRoute(entryId: Long? = null) = if (entryId != null) "create_entry?entryId=$entryId" else "create_entry"
+    }
     object EntryDetail : Screen("entry_detail/{entryId}") {
         fun createRoute(entryId: Long) = "entry_detail/$entryId"
     }

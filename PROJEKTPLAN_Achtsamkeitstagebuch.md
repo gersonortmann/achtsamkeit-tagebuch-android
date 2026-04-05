@@ -343,9 +343,9 @@ enum class MoodLevel(val score: Int, val emoji: String, val label: String) {
 #### Aufgaben
 - [x] Room-Datenbank definieren (`AppDatabase`)
 - [x] Entity `JournalEntryEntity` (vollständiges Schema)
-- [ ] Entity `GuidedQuestionEntity` mit Standard-Fragen (vorbefüllt)
+- [x] Entity `GuidedQuestionEntity` mit Standard-Fragen (vorbefüllt)
 - [x] DAO: `JournalEntryDao` (CRUD + Flows für reaktive Updates)
-- [ ] DAO: `GuidedQuestionDao`
+- [x] DAO: `GuidedQuestionDao`
 - [x] Domain-Modelle (keine Room-Abhängigkeit)
 - [x] Repository-Interfaces (Domain-Layer)
 - [x] Repository-Implementierungen (Data-Layer)
@@ -410,11 +410,11 @@ enum class MoodLevel(val score: Int, val emoji: String, val label: String) {
 - [ ] Suchfunktion (Volltextsuche in Room via FTS4)
 - [ ] Filter: nach Stimmung, nach Datum-Bereich, nach Tags
 - [ ] Kalenderansicht (MonthView, Einträge als farbige Punkte)
-- [ ] `SettingsScreen`
+- [x] `SettingsScreen`
+  - [x] Theme (Light / Dark / System)
+  - [ ] Geführte Fragen verwalten (aktivieren, deaktivieren, hinzufügen) - **[NEU: Personalisierung]**
   - [ ] Benachrichtigungszeit (Vorbereitung Phase 4)
-  - [ ] Geführte Fragen verwalten (aktivieren, deaktivieren, hinzufügen)
   - [ ] Sprache (derzeit fix Deutsch)
-  - [ ] Theme (Light / Dark / System)
   - [ ] Cloud-Sync-Auswahl (Vorbereitung Phase 8)
 
 #### Akzeptanzkriterien
