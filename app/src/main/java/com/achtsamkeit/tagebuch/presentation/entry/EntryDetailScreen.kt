@@ -8,12 +8,16 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import com.achtsamkeit.tagebuch.core.navigation.Screen
 import java.time.format.DateTimeFormatter
@@ -26,6 +30,13 @@ fun EntryDetailScreen(
     viewModel: EntryDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    LaunchedEffect(lifecycleOwner.lifecycle) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.loadEntry()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -86,15 +97,15 @@ fun EntryDetailScreen(
                         }
                     }
 
-                    if (entry.tags.isNotEmpty()) {
+                    if (entry.labels.isNotEmpty()) {
                         FlowRow(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            entry.tags.forEach { tag ->
+                            entry.labels.forEach { label ->
                                 AssistChip(
                                     onClick = { },
-                                    label = { Text(tag) }
+                                    label = { Text(label) }
                                 )
                             }
                         }

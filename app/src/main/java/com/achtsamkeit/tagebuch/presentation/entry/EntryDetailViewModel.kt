@@ -33,7 +33,7 @@ class EntryDetailViewModel @Inject constructor(
         loadEntry()
     }
 
-    private fun loadEntry() {
+    fun loadEntry() {
         viewModelScope.launch {
             _uiState.value = EntryDetailUiState(isLoading = true)
             try {

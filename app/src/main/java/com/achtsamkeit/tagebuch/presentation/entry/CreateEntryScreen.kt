@@ -1,6 +1,9 @@
 package com.achtsamkeit.tagebuch.presentation.entry
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -21,18 +24,23 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.achtsamkeit.tagebuch.domain.model.MoodLevel
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun CreateEntryScreen(
     navController: NavController,
     viewModel: EntryViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var showExitDialog by remember { mutableStateOf(false) }
+    var showSaveErrorDialog by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) {
@@ -40,13 +48,77 @@ fun CreateEntryScreen(
         }
     }
 
+    // Exit Confirmation Dialog
+    if (showExitDialog) {
+        AlertDialog(
+            onDismissRequest = { showExitDialog = false },
+            title = { Text("Bearbeitung beenden?") },
+            text = { Text("Deine Änderungen wurden noch nicht gespeichert. Möchtest du sie wirklich verwerfen?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showExitDialog = false
+                    navController.popBackStack()
+                }) {
+                    Text("Zurück ohne Speichern")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showExitDialog = false }) {
+                    Text("Weiterschreiben")
+                }
+            }
+        )
+    }
+
+    // Save Error Dialog
+    if (showSaveErrorDialog) {
+        AlertDialog(
+            onDismissRequest = { showSaveErrorDialog = false },
+            title = { Text("Eintrag leer") },
+            text = { Text("Bitte schreibe erst etwas in dein Tagebuch, bevor du speicherst.") },
+            confirmButton = {
+                TextButton(onClick = { showSaveErrorDialog = false }) {
+                    Text("Weiterschreiben")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showSaveErrorDialog = false
+                    navController.popBackStack()
+                }) {
+                    Text("Ohne Speichern zurück")
+                }
+            }
+        )
+    }
+
+    LaunchedEffect(uiState.error) {
+        if (uiState.error == "Bitte schreibe etwas in dein Tagebuch.") {
+            showSaveErrorDialog = true
+        }
+    }
+
     Scaffold(
-        modifier = Modifier.imePadding(),
+        contentWindowInsets = WindowInsets.systemBars,
         topBar = {
             TopAppBar(
-                title = { Text(if (uiState.guidedAnswers.any { it.answer.isNotBlank() } || uiState.freeText.isNotBlank()) "Eintrag bearbeiten" else "Neuer Eintrag") },
+                title = {
+                    Text(if (uiState.isEditMode) "Eintrag bearbeiten" else "Neuer Eintrag")
+                },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = {
+                        val hasInput = uiState.freeText.isNotBlank() ||
+                                uiState.guidedAnswers.any { it.answer.isNotBlank() } ||
+                                uiState.gratitudeItems.any { it.isNotBlank() } ||
+                                uiState.labels.isNotEmpty()
+                        val moodChanged = uiState.moodLevel != MoodLevel.NEUTRAL
+                        
+                        if (uiState.isEditMode || hasInput || moodChanged) {
+                            showExitDialog = true
+                        } else {
+                            navController.popBackStack()
+                        }
+                    }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Zurück")
                     }
                 },
@@ -70,7 +142,8 @@ fun CreateEntryScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .verticalScroll(rememberScrollState())
+                .imePadding()
+                .verticalScroll(scrollState)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
@@ -88,6 +161,7 @@ fun CreateEntryScreen(
 
             // Geführte Fragen
             uiState.guidedAnswers.forEach { guidedAnswer ->
+                val bringIntoViewReq = remember { BringIntoViewRequester() }
                 Card(
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.secondaryContainer
@@ -106,8 +180,13 @@ fun CreateEntryScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         OutlinedTextField(
                             value = guidedAnswer.answer,
-                            onValueChange = { viewModel.onGuidedAnswerChanged(guidedAnswer.question, it) },
-                            modifier = Modifier.fillMaxWidth(),
+                            onValueChange = { 
+                                viewModel.onGuidedAnswerChanged(guidedAnswer.question, it)
+                                scope.launch { bringIntoViewReq.bringIntoView() }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .bringIntoViewRequester(bringIntoViewReq),
                             placeholder = { Text("Deine Antwort...") },
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedContainerColor = MaterialTheme.colorScheme.surface,
@@ -136,6 +215,7 @@ fun CreateEntryScreen(
             }
 
             // Freitext
+            val freeTextBringIntoViewReq = remember { BringIntoViewRequester() }
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
                     text = "Gedanken & Notizen",
@@ -143,28 +223,27 @@ fun CreateEntryScreen(
                 )
                 OutlinedTextField(
                     value = uiState.freeText,
-                    onValueChange = viewModel::onFreeTextChanged,
+                    onValueChange = { 
+                        viewModel.onFreeTextChanged(it)
+                        scope.launch { freeTextBringIntoViewReq.bringIntoView() }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min = 150.dp),
+                        .heightIn(min = 150.dp)
+                        .bringIntoViewRequester(freeTextBringIntoViewReq),
                     placeholder = { Text("Was beschäftigt dich heute?") }
                 )
             }
 
-            // Tags Sektion
-            TagSection(
-                tags = uiState.tags,
-                onTagAdded = viewModel::onTagAdded,
-                onTagRemoved = viewModel::onTagRemoved
+            // Labels Sektion
+            LabelSection(
+                labels = uiState.labels,
+                onLabelAdded = viewModel::onLabelAdded,
+                onLabelRemoved = viewModel::onLabelRemoved
             )
 
-            if (uiState.error != null) {
-                Text(
-                    text = uiState.error!!,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
+            // Zusätzlicher Platz am Ende
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
@@ -230,17 +309,17 @@ fun DatePickerSection(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun TagSection(
-    tags: List<String>,
-    onTagAdded: (String) -> Unit,
-    onTagRemoved: (String) -> Unit
+fun LabelSection(
+    labels: List<String>,
+    onLabelAdded: (String) -> Unit,
+    onLabelRemoved: (String) -> Unit
 ) {
-    var tagInput by remember { mutableStateOf("") }
+    var labelInput by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
-            text = "Tags",
+            text = "Labels",
             style = MaterialTheme.typography.titleMedium
         )
 
@@ -248,11 +327,11 @@ fun TagSection(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            tags.forEach { tag ->
+            labels.forEach { label ->
                 InputChip(
                     selected = true,
-                    onClick = { onTagRemoved(tag) },
-                    label = { Text(tag) },
+                    onClick = { onLabelRemoved(label) },
+                    label = { Text(label) },
                     trailingIcon = {
                         Icon(
                             Icons.Default.Close,
@@ -265,15 +344,15 @@ fun TagSection(
         }
 
         OutlinedTextField(
-            value = tagInput,
-            onValueChange = { tagInput = it },
+            value = labelInput,
+            onValueChange = { labelInput = it },
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("Neuen Tag hinzufügen...") },
+            placeholder = { Text("Neues Label hinzufügen...") },
             trailingIcon = {
                 IconButton(onClick = {
-                    if (tagInput.isNotBlank()) {
-                        onTagAdded(tagInput.trim())
-                        tagInput = ""
+                    if (labelInput.isNotBlank()) {
+                        onLabelAdded(labelInput.trim())
+                        labelInput = ""
                     }
                 }) {
                     Icon(Icons.Default.Add, contentDescription = "Hinzufügen")
@@ -281,9 +360,9 @@ fun TagSection(
             },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = {
-                if (tagInput.isNotBlank()) {
-                    onTagAdded(tagInput.trim())
-                    tagInput = ""
+                if (labelInput.isNotBlank()) {
+                    onLabelAdded(labelInput.trim())
+                    labelInput = ""
                 }
                 focusManager.clearFocus()
             })

@@ -43,7 +43,7 @@ class EntryViewModel @Inject constructor(
 
     private fun loadExistingEntry(id: Long) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isSaving = true) } // Benutze isSaving als Lade-Indikator
+            _uiState.update { it.copy(isSaving = true, isEditMode = true) } // Benutze isSaving als Lade-Indikator
             val entry = getEntryByIdUseCase(id)
             if (entry != null) {
                 _uiState.update { state ->
@@ -53,12 +53,14 @@ class EntryViewModel @Inject constructor(
                         freeText = entry.freeText,
                         gratitudeItems = entry.gratitudeItems + List(3 - entry.gratitudeItems.size) { "" },
                         guidedAnswers = entry.guidedAnswers,
-                        tags = entry.tags,
-                        isSaving = false
+                        labels = entry.labels,
+                        createdAt = entry.createdAt,
+                        isSaving = false,
+                        isEditMode = true
                     )
                 }
             } else {
-                _uiState.update { it.copy(isSaving = false, error = "Eintrag nicht gefunden.") }
+                _uiState.update { it.copy(isSaving = false, error = "Eintrag nicht gefunden.", isEditMode = false) }
             }
         }
     }
@@ -107,43 +109,47 @@ class EntryViewModel @Inject constructor(
         _uiState.update { it.copy(entryDate = date) }
     }
 
-    fun onTagAdded(tag: String) {
-        if (tag.isBlank()) return
+    fun onLabelAdded(label: String) {
+        if (label.isBlank()) return
         _uiState.update { state ->
-            if (state.tags.contains(tag)) return@update state
-            state.copy(tags = state.tags + tag)
+            if (state.labels.contains(label)) return@update state
+            state.copy(labels = state.labels + label)
         }
     }
 
-    fun onTagRemoved(tag: String) {
+    fun onLabelRemoved(label: String) {
         _uiState.update { state ->
-            state.copy(tags = state.tags - tag)
+            state.copy(labels = state.labels - label)
         }
     }
 
     fun saveEntry() {
         val currentState = _uiState.value
-        if (currentState.freeText.isBlank() &&
-            currentState.guidedAnswers.all { it.answer.isBlank() } &&
-            currentState.gratitudeItems.all { it.isBlank() }
-        ) {
+        val isEmpty = currentState.freeText.isBlank() &&
+                currentState.guidedAnswers.all { it.answer.isBlank() } &&
+                currentState.gratitudeItems.all { it.isBlank() }
+
+        if (isEmpty) {
             _uiState.update { it.copy(error = "Bitte schreibe etwas in dein Tagebuch.") }
             return
         }
+
+        // Reset error state if it was set before
+        _uiState.update { it.copy(error = null) }
 
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true) }
             try {
                 val entry = JournalEntry(
-                    id = entryId ?: 0L,
+                    id = if (entryId == null || entryId == -1L) 0L else entryId,
                     date = currentState.entryDate,
-                    createdAt = LocalDateTime.now(),
+                    createdAt = currentState.createdAt ?: LocalDateTime.now(),
                     moodScore = currentState.moodLevel.score,
                     moodEmoji = currentState.moodLevel.emoji,
                     freeText = currentState.freeText,
                     gratitudeItems = currentState.gratitudeItems.filter { it.isNotBlank() },
                     guidedAnswers = currentState.guidedAnswers,
-                    tags = currentState.tags
+                    labels = currentState.labels
                 )
                 saveEntryUseCase(entry)
                 _uiState.update { it.copy(isSaving = false, isSaved = true) }

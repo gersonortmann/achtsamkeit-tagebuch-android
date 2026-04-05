@@ -1,8 +1,11 @@
 package com.achtsamkeit.tagebuch.presentation.settings
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
@@ -24,6 +27,7 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val themeConfig by viewModel.themeConfig.collectAsState()
+    val questions by viewModel.questions.collectAsState()
 
     Scaffold(
         topBar = {
@@ -41,9 +45,12 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp),
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            Spacer(modifier = Modifier.height(8.dp))
+
             Text(
                 text = "Erscheinungsbild",
                 style = MaterialTheme.typography.titleMedium,
@@ -75,7 +82,55 @@ fun SettingsScreen(
                     )
                 }
             }
+
+            Text(
+                text = "Fragenkatalog verwalten",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(vertical = 8.dp)
+                ) {
+                    questions.forEach { question ->
+                        QuestionOption(
+                            question = question.question,
+                            isSelected = question.isSelected,
+                            onToggle = { viewModel.toggleQuestionSelection(question) }
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
         }
+    }
+}
+
+@Composable
+fun QuestionOption(
+    question: String,
+    isSelected: Boolean,
+    onToggle: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onToggle() }
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Checkbox(
+            checked = isSelected,
+            onCheckedChange = null // Handled by row click
+        )
+        Text(
+            text = question,
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(start = 16.dp)
+        )
     }
 }
 

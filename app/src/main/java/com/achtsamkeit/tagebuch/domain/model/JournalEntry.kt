@@ -14,7 +14,7 @@ data class JournalEntry(
     val freeText: String,
     val gratitudeItems: List<String> = emptyList(),
     val guidedAnswers: List<GuidedAnswer> = emptyList(),
-    val tags: List<String> = emptyList()
+    val labels: List<String> = emptyList()
 )
 
 enum class MoodLevel(val score: Int, val emoji: String, val label: String) {

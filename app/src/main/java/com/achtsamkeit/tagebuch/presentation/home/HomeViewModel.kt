@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,12 +32,9 @@ class HomeViewModel @Inject constructor(
 
     fun loadTodayEntry() {
         viewModelScope.launch {
-            _uiState.value = HomeUiState(isLoading = true)
-            try {
-                val entry = getTodayEntryUseCase()
-                _uiState.value = HomeUiState(todayEntry = entry)
-            } catch (e: Exception) {
-                _uiState.value = HomeUiState(error = e.localizedMessage)
+            _uiState.update { it.copy(isLoading = true) }
+            getTodayEntryUseCase().collect { entry ->
+                _uiState.update { it.copy(todayEntry = entry, isLoading = false) }
             }
         }
     }

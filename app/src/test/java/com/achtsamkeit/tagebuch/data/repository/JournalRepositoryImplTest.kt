@@ -41,7 +41,7 @@ class JournalRepositoryImplTest {
             freeText = "Test",
             gratitudeItems = "",
             guidedAnswersJson = "[]",
-            tags = ""
+            labels = ""
         )
         every { journalDao.getAllEntries() } returns flowOf(listOf(entity))
 

@@ -1,5 +1,6 @@
 package com.achtsamkeit.tagebuch.data.local.entities
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -14,5 +15,6 @@ data class JournalEntryEntity(
     val freeText: String,
     val gratitudeItems: String, // Pipe-getrennte Liste
     val guidedAnswersJson: String, // Speichert Fragen und Antworten als JSON
-    val tags: String = "" // Pipe-getrennte Tags
+    @ColumnInfo(name = "tags")
+    val labels: String = "" // Pipe-getrennte Labels
 )
