@@ -3,17 +3,20 @@ package com.achtsamkeit.tagebuch.presentation.entry
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.achtsamkeit.tagebuch.domain.usecase.DeleteEntryUseCase
 import com.achtsamkeit.tagebuch.domain.usecase.GetEntryByIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class EntryDetailViewModel @Inject constructor(
     private val getEntryByIdUseCase: GetEntryByIdUseCase,
+    private val deleteEntryUseCase: DeleteEntryUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -28,17 +31,25 @@ class EntryDetailViewModel @Inject constructor(
 
     fun loadEntry() {
         viewModelScope.launch {
-            _uiState.value = EntryDetailUiState(isLoading = true)
+            _uiState.update { it.copy(isLoading = true) }
             try {
                 val entry = getEntryByIdUseCase(entryId)
                 if (entry != null) {
-                    _uiState.value = EntryDetailUiState(entry = entry)
+                    _uiState.update { it.copy(entry = entry, isLoading = false, error = null) }
                 } else {
-                    _uiState.value = EntryDetailUiState(error = "Eintrag nicht gefunden.")
+                    _uiState.update { it.copy(error = "Eintrag nicht gefunden.", isLoading = false) }
                 }
             } catch (e: Exception) {
-                _uiState.value = EntryDetailUiState(error = e.localizedMessage)
+                _uiState.update { it.copy(error = e.localizedMessage, isLoading = false) }
             }
+        }
+    }
+
+    fun deleteEntry() {
+        val entry = _uiState.value.entry ?: return
+        viewModelScope.launch {
+            deleteEntryUseCase(entry)
+            _uiState.update { it.copy(isDeleted = true) }
         }
     }
 }

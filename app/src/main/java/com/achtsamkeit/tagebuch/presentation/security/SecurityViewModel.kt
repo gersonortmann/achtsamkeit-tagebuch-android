@@ -23,7 +23,6 @@ class SecurityViewModel @Inject constructor(
     val isAuthenticated: StateFlow<Boolean> = _isAuthenticated.asStateFlow()
 
     private val _isBiometricEnabled = MutableStateFlow(false)
-    @Suppress("unused") // Wird in Phase 3 von SettingsScreen verwendet
     val isBiometricEnabled: StateFlow<Boolean> = _isBiometricEnabled.asStateFlow()
 
     init {
@@ -51,7 +50,6 @@ class SecurityViewModel @Inject constructor(
         )
     }
 
-    @Suppress("unused") // Wird in Phase 3 von SettingsScreen verwendet
     fun toggleBiometric(enabled: Boolean) {
         viewModelScope.launch {
             securityRepository.setBiometricEnabled(enabled)

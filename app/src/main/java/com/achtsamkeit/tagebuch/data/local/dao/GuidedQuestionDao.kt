@@ -1,6 +1,7 @@
 package com.achtsamkeit.tagebuch.data.local.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -21,6 +22,9 @@ interface GuidedQuestionDao {
 
     @Update
     suspend fun updateQuestion(question: GuidedQuestionEntity)
+
+    @Delete
+    suspend fun deleteQuestion(question: GuidedQuestionEntity)
 
     @Query("SELECT * FROM guided_questions ORDER BY RANDOM() LIMIT 1")
     suspend fun getRandomQuestion(): GuidedQuestionEntity?

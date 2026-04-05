@@ -11,7 +11,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import com.achtsamkeit.tagebuch.R
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -29,10 +31,10 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Achtsamkeitstagebuch") },
+                title = { Text(stringResource(R.string.home_title)) },
                 actions = {
                     IconButton(onClick = { navController.navigate(Screen.Settings.route) }) {
-                        Icon(Icons.Default.Settings, contentDescription = "Einstellungen")
+                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.home_settings_desc))
                     }
                 }
             )
@@ -41,7 +43,7 @@ fun HomeScreen(
             FloatingActionButton(
                 onClick = { navController.navigate(Screen.CreateEntry.createRoute()) }
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Neuer Eintrag")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.home_new_entry_fab))
             }
         }
     ) { padding ->
@@ -62,7 +64,7 @@ fun HomeScreen(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Dein heutiger Eintrag",
+                        text = stringResource(R.string.home_today_entry_title),
                         style = MaterialTheme.typography.headlineSmall
                     )
                     Spacer(modifier = Modifier.height(16.dp))
@@ -106,7 +108,7 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(24.dp))
                     OutlinedButton(
                         onClick = { navController.navigate(Screen.Archive.route) }
-                    ) { Text("Archiv öffnen") }
+                    ) { Text(stringResource(R.string.home_archive_button)) }
                 }
             } else {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -116,18 +118,18 @@ fun HomeScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Willkommen zurück",
+                        text = stringResource(R.string.home_welcome_back),
                         style = MaterialTheme.typography.headlineMedium
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Tippe auf + um deinen heutigen Eintrag zu beginnen",
+                        text = stringResource(R.string.home_welcome_hint),
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                     OutlinedButton(
                         onClick = { navController.navigate(Screen.Archive.route) }
-                    ) { Text("Archiv öffnen") }
+                    ) { Text(stringResource(R.string.home_archive_button)) }
                 }
             }
         }

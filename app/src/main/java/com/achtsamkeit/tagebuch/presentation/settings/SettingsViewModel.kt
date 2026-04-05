@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.achtsamkeit.tagebuch.domain.model.GuidedQuestion
 import com.achtsamkeit.tagebuch.domain.model.ThemeConfig
 import com.achtsamkeit.tagebuch.domain.repository.AchtsamkeitRepository
+import com.achtsamkeit.tagebuch.domain.repository.JournalRepository
+import com.achtsamkeit.tagebuch.domain.repository.SecurityRepository
 import com.achtsamkeit.tagebuch.domain.usecase.GetAllQuestionsUseCase
 import com.achtsamkeit.tagebuch.domain.usecase.UpdateQuestionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,6 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val repository: AchtsamkeitRepository,
+    private val securityRepository: SecurityRepository,
+    private val journalRepository: JournalRepository,
     getAllQuestionsUseCase: GetAllQuestionsUseCase,
     private val updateQuestionUseCase: UpdateQuestionUseCase
 ) : ViewModel() {
@@ -35,15 +39,66 @@ class SettingsViewModel @Inject constructor(
             initialValue = emptyList()
         )
 
+    val isBiometricEnabled: StateFlow<Boolean> = securityRepository.isBiometricEnabled
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
+        )
+
+    val reminderEnabled: StateFlow<Boolean> = repository.reminderEnabled
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
+        )
+
+    val reminderHour: StateFlow<Int> = repository.reminderHour
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = 20
+        )
+
+    val reminderMinute: StateFlow<Int> = repository.reminderMinute
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = 0
+        )
+
     fun setThemeConfig(config: ThemeConfig) {
-        viewModelScope.launch {
-            repository.setThemeConfig(config)
-        }
+        viewModelScope.launch { repository.setThemeConfig(config) }
     }
 
     fun toggleQuestionSelection(question: GuidedQuestion) {
         viewModelScope.launch {
             updateQuestionUseCase(question.copy(isSelected = !question.isSelected))
         }
+    }
+
+    fun addQuestion(text: String) {
+        if (text.isBlank()) return
+        viewModelScope.launch {
+            journalRepository.insertQuestion(
+                GuidedQuestion(question = text.trim(), isDefault = false, isSelected = true)
+            )
+        }
+    }
+
+    fun deleteQuestion(question: GuidedQuestion) {
+        viewModelScope.launch { journalRepository.deleteQuestion(question) }
+    }
+
+    fun setBiometricEnabled(enabled: Boolean) {
+        viewModelScope.launch { securityRepository.setBiometricEnabled(enabled) }
+    }
+
+    fun setReminderEnabled(enabled: Boolean) {
+        viewModelScope.launch { repository.setReminderEnabled(enabled) }
+    }
+
+    fun setReminderTime(hour: Int, minute: Int) {
+        viewModelScope.launch { repository.setReminderTime(hour, minute) }
     }
 }

@@ -1,3 +1,82 @@
 <resources>
     <string name="app_name">Achtsamkeitstagebuch</string>
+
+    <!-- Home Screen -->
+    <string name="home_title">Achtsamkeitstagebuch</string>
+    <string name="home_settings_desc">Einstellungen</string>
+    <string name="home_new_entry_fab">Neuer Eintrag</string>
+    <string name="home_today_entry_title">Dein heutiger Eintrag</string>
+    <string name="home_archive_button">Archiv öffnen</string>
+    <string name="home_welcome_back">Willkommen zurück</string>
+    <string name="home_welcome_hint">Tippe auf + um deinen heutigen Eintrag zu beginnen</string>
+
+    <!-- Archive Screen -->
+    <string name="archive_title">Archiv</string>
+    <string name="archive_back_desc">Zurück</string>
+    <string name="archive_show_labels">Labels einblenden</string>
+    <string name="archive_hide_labels">Labels ausblenden</string>
+    <string name="archive_search_placeholder">Einträge durchsuchen…</string>
+    <string name="archive_no_entries">Noch keine Einträge vorhanden.</string>
+    <string name="archive_no_results">Keine Einträge gefunden.</string>
+    <string name="archive_entry_deleted">Eintrag gelöscht</string>
+    <string name="archive_undo">Rückgängig</string>
+    <string name="archive_delete_desc">Löschen</string>
+    <string name="archive_filter_desc">Filter</string>
+    <string name="archive_filter_title">Filter</string>
+    <string name="archive_filter_reset">Zurücksetzen</string>
+    <string name="archive_filter_mood_title">Stimmung</string>
+    <string name="archive_filter_date_title">Zeitraum</string>
+    <string name="archive_filter_date_from_placeholder">Von: [Datum]</string>
+    <string name="archive_filter_date_to_placeholder">Bis: [Datum]</string>
+    <string name="archive_filter_labels_title">Labels</string>
+    <string name="archive_date_picker_ok">OK</string>
+    <string name="archive_date_picker_cancel">Abbrechen</string>
+    <string name="archive_label_singular">1 Label</string>
+    <string name="archive_label_plural">%d Labels</string>
+
+    <!-- Entry Detail Screen -->
+    <string name="detail_title">Eintrag Details</string>
+    <string name="detail_edit_desc">Bearbeiten</string>
+    <string name="detail_delete_desc">Löschen</string>
+    <string name="detail_delete_dialog_title">Eintrag löschen?</string>
+    <string name="detail_delete_dialog_text">Möchtest du diesen Tagebucheintrag wirklich unwiderruflich löschen?</string>
+    <string name="detail_delete_confirm">Löschen</string>
+    <string name="detail_delete_cancel">Abbrechen</string>
+    <string name="detail_mood_label">Gefühlslage: %s</string>
+    <string name="detail_gratitude_title">Dankbarkeit</string>
+    <string name="detail_thoughts_title">Gedanken</string>
+    <string name="detail_error_not_found">Eintrag nicht gefunden.</string>
+
+    <!-- Create Entry Screen -->
+    <string name="create_title_new">Neuer Eintrag</string>
+    <string name="create_title_edit">Eintrag bearbeiten</string>
+    <string name="create_save">Speichern</string>
+    <string name="create_mood_question">Wie geht es dir heute?</string>
+    <string name="create_labels_hint">Labels (mit Komma trennen)</string>
+    <string name="create_gratitude_title">Dankbarkeit</string>
+    <string name="create_gratitude_hint">Wofür bist du heute dankbar?</string>
+    <string name="create_thoughts_title">Gedanken</string>
+    <string name="create_thoughts_hint">Was beschäftigt dich gerade?</string>
+    <string name="create_error_empty">Bitte schreibe etwas in dein Tagebuch.</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Einstellungen</string>
+    <string name="settings_section_appearance">Erscheinungsbild</string>
+    <string name="settings_theme_mode">Design</string>
+    <string name="settings_theme_system">Systemstandard</string>
+    <string name="settings_theme_light">Hell</string>
+    <string name="settings_theme_dark">Dunkel</string>
+    <string name="settings_section_security">Sicherheit</string>
+    <string name="settings_biometric_lock">Biometrischer Schutz</string>
+    <string name="settings_biometric_desc">App beim Öffnen mit Fingerabdruck oder Face ID sperren</string>
+    <string name="settings_section_notifications">Benachrichtigungen</string>
+    <string name="settings_reminder_enabled">Tägliche Erinnerung</string>
+    <string name="settings_reminder_desc">Benachrichtigung zum Schreiben ins Tagebuch</string>
+    <string name="settings_reminder_time">Uhrzeit</string>
+    <string name="settings_section_questions">Fragenkatalog verwalten</string>
+    <string name="settings_delete_question_title">Frage löschen?</string>
+    <string name="settings_delete_question_text">\"%s\" wird dauerhaft entfernt.</string>
+    <string name="settings_add_question_hint">Neue Frage hinzufügen…</string>
+    <string name="settings_dialog_ok">OK</string>
+    <string name="settings_dialog_cancel">Abbrechen</string>
 </resources>

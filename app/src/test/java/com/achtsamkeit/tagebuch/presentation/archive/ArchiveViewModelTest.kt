@@ -1,7 +1,11 @@
 package com.achtsamkeit.tagebuch.presentation.archive
 
 import com.achtsamkeit.tagebuch.domain.model.JournalEntry
+import com.achtsamkeit.tagebuch.domain.usecase.DeleteEntryUseCase
 import com.achtsamkeit.tagebuch.domain.usecase.GetEntriesUseCase
+import com.achtsamkeit.tagebuch.domain.usecase.SaveEntryUseCase
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -10,6 +14,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.*
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import java.time.LocalDate
@@ -18,6 +23,8 @@ import java.time.LocalDate
 class ArchiveViewModelTest {
 
     private val getEntriesUseCase = mockk<GetEntriesUseCase>()
+    private val deleteEntryUseCase = mockk<DeleteEntryUseCase>()
+    private val saveEntryUseCase = mockk<SaveEntryUseCase>()
     private lateinit var viewModel: ArchiveViewModel
     private val testDispatcher = StandardTestDispatcher()
 
@@ -44,7 +51,9 @@ class ArchiveViewModelTest {
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         every { getEntriesUseCase() } returns flowOf(testEntries)
-        viewModel = ArchiveViewModel(getEntriesUseCase)
+        coEvery { deleteEntryUseCase(any()) } returns Unit
+        coEvery { saveEntryUseCase(any()) } returns 0L
+        viewModel = ArchiveViewModel(getEntriesUseCase, deleteEntryUseCase, saveEntryUseCase)
     }
 
     @After
@@ -103,5 +112,74 @@ class ArchiveViewModelTest {
         viewModel.onSearchQueryChange("")
         advanceUntilIdle()
         assertEquals(2, viewModel.uiState.value.entries.size)
+    }
+
+    @Test
+    fun `mood filter filters entries`() = runTest {
+        advanceUntilIdle()
+        viewModel.onMoodFilterToggle(5)
+        advanceUntilIdle()
+        
+        val state = viewModel.uiState.value
+        assertEquals(1, state.entries.size)
+        assertEquals(5, state.entries[0].moodScore)
+    }
+
+    @Test
+    fun `date from filter filters entries`() = runTest {
+        advanceUntilIdle()
+        viewModel.onDateFromChange(LocalDate.now())
+        advanceUntilIdle()
+        
+        val state = viewModel.uiState.value
+        assertEquals(1, state.entries.size)
+        assertEquals(1L, state.entries[0].id)
+    }
+
+    @Test
+    fun `label filter filters entries`() = runTest {
+        advanceUntilIdle()
+        viewModel.onLabelFilterToggle("Arbeit")
+        advanceUntilIdle()
+        
+        val state = viewModel.uiState.value
+        assertEquals(1, state.entries.size)
+        assertEquals(2L, state.entries[0].id)
+    }
+
+    @Test
+    fun `multiple filters combine with AND logic`() = runTest {
+        advanceUntilIdle()
+        // Mood 5 AND label "Arbeit" -> 0 results
+        viewModel.onMoodFilterToggle(5)
+        viewModel.onLabelFilterToggle("Arbeit")
+        advanceUntilIdle()
+        
+        assertEquals(0, viewModel.uiState.value.entries.size)
+    }
+
+    @Test
+    fun `delete entry calls use case and sets deletedEntry for undo`() = runTest {
+        advanceUntilIdle()
+        val entryToDelete = testEntries[0]
+        viewModel.deleteEntry(entryToDelete)
+        advanceUntilIdle()
+        
+        coVerify { deleteEntryUseCase(entryToDelete) }
+        assertEquals(entryToDelete, viewModel.uiState.value.deletedEntry)
+    }
+
+    @Test
+    fun `restore entry calls save use case and clears deletedEntry`() = runTest {
+        advanceUntilIdle()
+        val entryToRestore = testEntries[0]
+        viewModel.deleteEntry(entryToRestore)
+        advanceUntilIdle()
+        
+        viewModel.restoreEntry()
+        advanceUntilIdle()
+        
+        coVerify { saveEntryUseCase(entryToRestore) }
+        assertNull(viewModel.uiState.value.deletedEntry)
     }
 }

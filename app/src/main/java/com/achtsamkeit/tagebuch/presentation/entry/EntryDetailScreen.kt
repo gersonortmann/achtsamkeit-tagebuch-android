@@ -5,12 +5,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.ui.res.stringResource
+import com.achtsamkeit.tagebuch.R
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -31,6 +31,7 @@ fun EntryDetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val lifecycleOwner = LocalLifecycleOwner.current
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(lifecycleOwner.lifecycle) {
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -38,20 +39,53 @@ fun EntryDetailScreen(
         }
     }
 
+    LaunchedEffect(uiState.isDeleted) {
+        if (uiState.isDeleted) {
+            navController.popBackStack()
+        }
+    }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text(stringResource(R.string.detail_delete_dialog_title)) },
+            text = { Text(stringResource(R.string.detail_delete_dialog_text)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.deleteEntry()
+                        showDeleteDialog = false
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text(stringResource(R.string.detail_delete_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text(stringResource(R.string.detail_delete_cancel))
+                }
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Eintrag Details") },
+                title = { Text(stringResource(R.string.detail_title)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Zurück")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.archive_back_desc))
                     }
                 },
                 actions = {
+                    IconButton(onClick = { showDeleteDialog = true }) {
+                        Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.detail_delete_desc))
+                    }
                     IconButton(onClick = { 
                         navController.navigate(Screen.CreateEntry.createRoute(entryId)) 
                     }) {
-                        Icon(Icons.Default.Edit, contentDescription = "Bearbeiten")
+                        Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.detail_edit_desc))
                     }
                 }
             )
@@ -90,7 +124,7 @@ fun EntryDetailScreen(
                                 style = MaterialTheme.typography.titleLarge
                             )
                             Text(
-                                text = "Gefühlslage: ${entry.moodEmoji}",
+                                text = stringResource(R.string.detail_mood_label, entry.moodEmoji),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.primary
                             )
@@ -144,7 +178,7 @@ fun EntryDetailScreen(
                         ) {
                             Column(modifier = Modifier.padding(12.dp)) {
                                 Text(
-                                    text = "Dankbarkeit",
+                                    text = stringResource(R.string.detail_gratitude_title),
                                     style = MaterialTheme.typography.titleSmall,
                                     color = MaterialTheme.colorScheme.primary
                                 )
@@ -168,7 +202,7 @@ fun EntryDetailScreen(
                         ) {
                             Column(modifier = Modifier.padding(12.dp)) {
                                 Text(
-                                    text = "Gedanken",
+                                    text = stringResource(R.string.detail_thoughts_title),
                                     style = MaterialTheme.typography.titleSmall,
                                     color = MaterialTheme.colorScheme.primary
                                 )
